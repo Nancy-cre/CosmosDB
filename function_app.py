@@ -1,6 +1,7 @@
 import azure.functions as func
 import azure.cosmos as cosmos
 from azure.identity import DefaultAzureCredential
+import logging
 
 app = func.FunctionApp()
 
@@ -23,3 +24,25 @@ def showUser(req : func.HttpRequest) -> func.HttpResponse:
         #html += user + '</br>'
         
     return func.HttpResponse('<h1>日本のユーザー一覧</h1>', mimetype = 'text/html', status_code = 200)
+
+@app.route(route="http_trigger", auth_level=func.AuthLevel.FUNCTION)
+def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+    name = req.params.get('name')
+    if not name:
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            pass
+        else:
+            name = req_body.get('name')
+
+    if name:
+        return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
+    else:
+        return func.HttpResponse(
+             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+             status_code=200
+        )
+
