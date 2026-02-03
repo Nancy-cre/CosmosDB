@@ -1,5 +1,5 @@
 import azure.functions as func
-#import azure.cosmos as cosmos
+import azure.cosmos as cosmos
 from azure.identity import DefaultAzureCredential
 import logging
 
@@ -10,25 +10,25 @@ def show_user(req : func.HttpRequest) -> func.HttpResponse:
     defCred = DefaultAzureCredential()
 
     cosmos_url = 'https://cosmos20260202.documents.azure.com:443/'
-    #cosmosClient = cosmos.CosmosClient(cosmos_url, defCred, '3')
+    cosmosClient = cosmos.CosmosClient(cosmos_url, defCred, '3')
 
-    #dbClient = cosmosClient.get_database_client('cosmosDb')
+    dbClient = cosmosClient.get_database_client('cosmosDb')
 
-    #container = dbClient.get_container_client('UserM')
+    container = dbClient.get_container_client('UserM')
     
-    #userList = container.query_items("SELECT * FROM c", enable_cross_partition_query=True)
+    userList = container.query_items("SELECT * FROM c", enable_cross_partition_query=True)
 
     html = '<h1>日本のユーザー一覧</h1>'
 
-    #for user in userList:
-        #if user['CountryID'] == 'Japan':
-            #html += user['id'] + '----------'
-            #html += user['CountryID'] + '----------'
-            #html += user['UserID'] + '----------'
-            #html += user['_rid'] + '----------'
-            #html += user['_self'] + '----------'
-            #html += user['_etag'] + '----------'
-            #html += user['_attachments'] + '</br>'
+    for user in userList:
+        if user['CountryID'] == 'Japan':
+            html += user['id'] + '----------'
+            html += user['CountryID'] + '----------'
+            html += user['UserID'] + '----------'
+            html += user['_rid'] + '----------'
+            html += user['_self'] + '----------'
+            html += user['_etag'] + '----------'
+            html += user['_attachments'] + '</br>'
             #html += user['_ts'] + ':'
      
     return func.HttpResponse(html, mimetype='text/html', status_code = 200)
