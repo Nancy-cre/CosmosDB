@@ -5,25 +5,33 @@ import logging
 
 app = func.FunctionApp()
 
-app.route('ShowUser', auth_level = func.AuthLevel.FUNCTION)
-def showUser(req : func.HttpRequest) -> func.HttpResponse:
-    #defCred = DefaultAzureCredential()
+@app.route(route='show_user', auth_level = func.AuthLevel.FUNCTION)
+def show_user(req : func.HttpRequest) -> func.HttpResponse:
+    defCred = DefaultAzureCredential()
 
-    #cosmos_url = 'https://cosmos20260202.documents.azure.com:443/'
-    #cosmosClient = cosmos.CosmosClient(cosmos_url, defCred, '3')
+    cosmos_url = 'https://cosmos20260202.documents.azure.com:443/'
+    cosmosClient = cosmos.CosmosClient(cosmos_url, defCred, '3')
 
-    #dbClient = cosmosClient.get_database_client('cosmosDb')
+    dbClient = cosmosClient.get_database_client('cosmosDb')
 
-    #dbClient.get_container_client('UserM')
+    container = dbClient.get_container_client('UserM')
     
-    #userList = dbClient.query_containers("SELECT * FROM c CountryID = 'Japan'")
+    userList = container.query_items("SELECT * FROM c", enable_cross_partition_query=True)
 
-    #html = '<h1>日本のユーザー一覧</h1>'
+    html = '<h1>日本のユーザー一覧</h1>'
 
-    #for user in userList:
-        #html += user + '</br>'
-        
-    return func.HttpResponse('<h1>日本のユーザー一覧</h1>', mimetype = 'text/html', status_code = 200)
+    for user in userList:
+        if user['CountryID'] == 'Japan':
+            html += user['id'] + '----------'
+            html += user['CountryID'] + '----------'
+            html += user['UserID'] + '----------'
+            html += user['_rid'] + '----------'
+            html += user['_self'] + '----------'
+            html += user['_etag'] + '----------'
+            html += user['_attachments'] + '</br>'
+            #html += user['_ts'] + ':'
+     
+    return func.HttpResponse(html, mimetype='text/html', status_code = 200)
 
 @app.route(route="http_trigger", auth_level=func.AuthLevel.FUNCTION)
 def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
