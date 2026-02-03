@@ -5,7 +5,7 @@ import logging
 
 app = func.FunctionApp()
 
-@app.route(route='show_user', auth_level = func.AuthLevel.FUNCTION)
+@app.route(route="show_user", auth_level = func.AuthLevel.FUNCTION)
 def show_user(req : func.HttpRequest) -> func.HttpResponse:
     defCred = DefaultAzureCredential()
 
